@@ -1,5 +1,5 @@
 #
-# CSE 5522: HW 3 Linear Classification w/ Perceptrons
+# CSE 5522: HW 3 Linear Classification w/ Perceptron Learning
 # Author: Nora Myer
 #
 
@@ -8,18 +8,21 @@ from matplotlib.pyplot import *
 import json
 
 data_vectorization_labels = [1.0, "is_weekday", "is_Saturday", "is_Sunday", "is_morning", "is_afternoon", "is_evening", "is_<30", "is_30-60", "is_>60", "is_silly", "is_happy", "is_tired", "friendsVisiting", "kidsPlaying", "atHome", "snacks"]
-training_epochs = 10
+training_epochs = 30
 attr_dict = {}
 training_accuracies_current = []
+test_accuracies_current = []
 training_accuracies_averaged = []
+test_accuracies_averaged = []
 block_with_plot = True
 
 def plot_assignments():
-    print(training_accuracies_current)
-    print(training_accuracies_averaged)
+    plot(range(training_epochs), training_accuracies_current, 'bo-', label = 'Current train')
+    plot(range(training_epochs), training_accuracies_averaged, 'b^-', label = 'Averaged train')
+    plot(range(training_epochs), test_accuracies_current, 'ro-', label = 'Current test')
+    plot(range(training_epochs), test_accuracies_averaged, 'r^-', label = 'Averaged test')
 
-    plot(range(training_epochs), training_accuracies_current, 'b^-', label = 'Current')
-    plot(range(training_epochs), training_accuracies_averaged, 'g^-', label = 'Averaged')
+    legend()
     ylabel('Accuracy')
     xlabel('Epoch')
     show(block = block_with_plot)
@@ -64,7 +67,7 @@ def averaged_perceptron(train_set, train_labels, test_data, test_labels):
     for l in range(training_epochs):
         for i in range(len(train)):
             h = 0.0
-            if np.dot(w, train[i]) >= 0:
+            if np.dot(w, train[i]) >= 0.0:
                 h = 1.0
 
             w = w + ((train_labels[i] - h) * train[i])
@@ -80,6 +83,8 @@ def averaged_perceptron(train_set, train_labels, test_data, test_labels):
 def current_and_averaged_model_accuracy(train_set, test_set, train_labels, test_labels, avg_weights, current_weights):
     global training_accuracies_averaged
     global training_accuracies_current
+    global test_accuracies_averaged
+    global test_accuracies_current
 
     train_p_current = predict(train_set, current_weights)
     train_a_current = get_accuracy(train_p_current, train_labels)
@@ -98,6 +103,8 @@ def current_and_averaged_model_accuracy(train_set, test_set, train_labels, test_
     print("Train, test accuracies on averaged model: " + str(train_a_avg) + "  " + str(test_a_avg))
     training_accuracies_current.append(train_a_current)
     training_accuracies_averaged.append(train_a_avg)
+    test_accuracies_current.append(test_a_current)
+    test_accuracies_averaged.append(test_a_avg)
 
 def reset_dict():
     global attr_dict
@@ -109,11 +116,11 @@ def reset_dict():
 def predict(data_set, weights):
     predictions = []
     for row in data_set:
-        activation = weights[0]
-        for idx in range(len(row) - 1):
-            activation += weights[idx + 1] * row[idx]
+        activation = 0.0
+        for idx in range(len(row)):
+            activation += weights[idx] * row[idx]
 
-        if activation >= 0.0:
+        if activation >= 1.0:
             predictions.append(1.0)
         else:
             predictions.append(0.0)
@@ -138,8 +145,8 @@ def main():
     vectorized_data_test, vectorized_labels_test = vectorize_data(test_set)
 
     avg_weights = averaged_perceptron(vectorized_data_train, vectorized_labels_train, vectorized_data_test, vectorized_labels_test)
-    print(avg_weights)
     plot_assignments()
+    print(avg_weights)
 
 if __name__ == "__main__":
     main()
