@@ -18,8 +18,8 @@ def plot_assignments():
     print(training_accuracies_current)
     print(training_accuracies_averaged)
 
-    plot(range(training_epochs), training_accuracies_current, 'b^-', label = 'line 1')
-    plot(range(training_epochs), training_accuracies_averaged, 'g^-', label = 'line 2')
+    plot(range(training_epochs), training_accuracies_current, 'b^-', label = 'Current')
+    plot(range(training_epochs), training_accuracies_averaged, 'g^-', label = 'Averaged')
     ylabel('Accuracy')
     xlabel('Epoch')
     show(block = block_with_plot)
