@@ -10,17 +10,18 @@ import json
 data_vectorization_labels = [1.0, "is_weekday", "is_Saturday", "is_Sunday", "is_morning", "is_afternoon", "is_evening", "is_<30", "is_30-60", "is_>60", "is_silly", "is_happy", "is_tired", "friendsVisiting", "kidsPlaying", "atHome", "snacks"]
 training_epochs = 10
 attr_dict = {}
+training_accuracies_current = []
+training_accuracies_averaged = []
+block_with_plot = True
 
-def plot_assignments(curmeans,data,labels):
-    clf()
-    curassign = kmeans_pointassignments(curmeans,data)
+def plot_assignments():
+    print(training_accuracies_current)
+    print(training_accuracies_averaged)
 
-    for i in range(0 , curmeans.shape[0]):
-        tp = compress(curassign == i, data, axis = 0)
-        plot(tp[:,0],tp[:,1],colors[i])
-    for ((x,y),lab) in zip(data ,labels):
-        text(x + .03, y + .03, lab, fontsize = 9)
-    plot(curmeans[:,0], curmeans[:,1], 'c^', markersize = 12)
+    plot(range(training_epochs), training_accuracies_current, 'b^-', label = 'line 1')
+    plot(range(training_epochs), training_accuracies_averaged, 'g^-', label = 'line 2')
+    ylabel('Accuracy')
+    xlabel('Epoch')
     show(block = block_with_plot)
 
 def read_data(training_file, test_file):
@@ -56,19 +57,47 @@ def vectorize_data(data_set):
     return vectorized_data, vectorized_labels
 
 def averaged_perceptron(train_set, train_labels, test_data, test_labels):
+    train = np.array(train_set)
     w = np.zeros(len(train_set[0]))
     t = np.zeros(len(train_set[0]))
 
     for l in range(training_epochs):
-        for i in range(len(train_set)):
+        for i in range(len(train)):
             h = 0.0
-            if np.dot(w, train_set[i]) >= 0:
+            if np.dot(w, train[i]) >= 0:
                 h = 1.0
 
-            w = w + ((train_labels[i] - h) * train_set[i])
+            w = w + ((train_labels[i] - h) * train[i])
             t = t + w
 
-    return 1.0/(training_epochs * len(train_set)) * t
+        #get new accuracies
+        print("****** At end of epoch: " + str(l) + " ******")
+        current_and_averaged_model_accuracy(train_set, test_data, train_labels, test_labels, 1.0/((l+1) * len(train)) * t, w)
+        print()
+
+    return 1.0/(training_epochs * len(train)) * t
+
+def current_and_averaged_model_accuracy(train_set, test_set, train_labels, test_labels, avg_weights, current_weights):
+    global training_accuracies_averaged
+    global training_accuracies_current
+
+    train_p_current = predict(train_set, current_weights)
+    train_a_current = get_accuracy(train_p_current, train_labels)
+
+    test_p_current = predict(test_set, current_weights)
+    test_a_current = get_accuracy(test_p_current, test_labels)
+
+    print("Train, test accuracies on current model: " + str(train_a_current) + "  " + str(test_a_current))
+
+    train_p_avg = predict(train_set, avg_weights)
+    train_a_avg = get_accuracy(train_p_avg, train_labels)
+
+    test_p_avg = predict(test_set, avg_weights)
+    test_a_avg = get_accuracy(test_p_avg, test_labels)
+
+    print("Train, test accuracies on averaged model: " + str(train_a_avg) + "  " + str(test_a_avg))
+    training_accuracies_current.append(train_a_current)
+    training_accuracies_averaged.append(train_a_avg)
 
 def reset_dict():
     global attr_dict
@@ -102,13 +131,15 @@ def get_accuracy(predictions, accurate_classifications):
     return 1.0 - (float(inaccurate_count) / len(predictions))
 
 def main():
+    print("Beginning linear classification .... \n")
     build_attr_dict()
     training_set, test_set = read_data("game_attrdata_train.dat", "game_attrdata_test.dat")
     vectorized_data_train, vectorized_labels_train = vectorize_data(training_set)
     vectorized_data_test, vectorized_labels_test = vectorize_data(test_set)
 
-    weights = averaged_perceptron(vectorized_data_train, vectorized_labels_train, vectorized_data_test, vectorized_labels_test)
-
+    avg_weights = averaged_perceptron(vectorized_data_train, vectorized_labels_train, vectorized_data_test, vectorized_labels_test)
+    print(avg_weights)
+    plot_assignments()
 
 if __name__ == "__main__":
     main()
