@@ -22,6 +22,12 @@ Vectorized data labels in the format:
 [1.0, "is_weekday", "is_Saturday", "is_Sunday", "is_morning", "is_afternoon", "is_evening", "is_<30", "is_30-60", "is_>60", "is_silly", "is_happy", "is_tired", "friendsVisiting", "kidsPlaying", "atHome", "snacks"]
 ```
 
+### Overall Results
+The following file contains the results of the averaged and current model for both training and test sets at each epoch.
+```
+averaged_perceptron.txt
+```
+
 ### Ablation testing
 There are two main files to look at for ablation testing.
 ```
