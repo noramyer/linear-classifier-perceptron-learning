@@ -1,0 +1,63 @@
+***** Ablation test removing: is_weekday*****
+Train accuracy on averaged model: 0.77
+Test accuracy on averaged model: 0.7
+
+***** Ablation test removing: is_Saturday*****
+Train accuracy on averaged model: 0.775
+Test accuracy on averaged model: 0.6799999999999999
+
+***** Ablation test removing: is_Sunday*****
+Train accuracy on averaged model: 0.75
+Test accuracy on averaged model: 0.6599999999999999
+
+***** Ablation test removing: is_morning*****
+Train accuracy on averaged model: 0.755
+Test accuracy on averaged model: 0.6599999999999999
+
+***** Ablation test removing: is_afternoon*****
+Train accuracy on averaged model: 0.745
+Test accuracy on averaged model: 0.6799999999999999
+
+***** Ablation test removing: is_evening*****
+Train accuracy on averaged model: 0.77
+Test accuracy on averaged model: 0.6799999999999999
+
+***** Ablation test removing: is_<30*****
+Train accuracy on averaged model: 0.755
+Test accuracy on averaged model: 0.64
+
+***** Ablation test removing: is_30-60*****
+Train accuracy on averaged model: 0.74
+Test accuracy on averaged model: 0.6
+
+***** Ablation test removing: is_>60*****
+Train accuracy on averaged model: 0.76
+Test accuracy on averaged model: 0.6599999999999999
+
+***** Ablation test removing: is_silly*****
+Train accuracy on averaged model: 0.745
+Test accuracy on averaged model: 0.6599999999999999
+
+***** Ablation test removing: is_happy*****
+Train accuracy on averaged model: 0.75
+Test accuracy on averaged model: 0.6599999999999999
+
+***** Ablation test removing: is_tired*****
+Train accuracy on averaged model: 0.745
+Test accuracy on averaged model: 0.62
+
+***** Ablation test removing: friendsVisiting*****
+Train accuracy on averaged model: 0.73
+Test accuracy on averaged model: 0.62
+
+***** Ablation test removing: kidsPlaying*****
+Train accuracy on averaged model: 0.77
+Test accuracy on averaged model: 0.6799999999999999
+
+***** Ablation test removing: atHome*****
+Train accuracy on averaged model: 0.77
+Test accuracy on averaged model: 0.62
+
+***** Ablation test removing: snacks*****
+Train accuracy on averaged model: 0.75
+Test accuracy on averaged model: 0.6599999999999999

@@ -62,7 +62,7 @@ def vectorize_data(data_set):
 
     return vectorized_data, vectorized_labels
 
-def averaged_perceptron(train_set, train_labels, test_data, test_labels):
+def averaged_perceptron(train_set, train_labels, test_data, test_labels, file):
     train = np.array(train_set)
     w = np.zeros(len(train_set[0]))
     t = np.zeros(len(train_set[0]))
@@ -75,9 +75,9 @@ def averaged_perceptron(train_set, train_labels, test_data, test_labels):
             t = t + w
 
         #get new accuracies
-        print("****** At end of epoch: " + str(l) + " ******")
-        current_and_averaged_model_accuracy(train_set, test_data, train_labels, test_labels, 1.0/((l+1) * len(train)) * t, w)
-        print()
+        file.write("****** At end of epoch: " + str(l) + " ******\n")
+        current_and_averaged_model_accuracy(train_set, test_data, train_labels, test_labels, 1.0/((l+1) * len(train)) * t, w, file)
+        file.write("\n\n")
 
     return 1.0/(training_epochs * len(train)) * t
 
@@ -87,7 +87,7 @@ def decision_function(w, row):
 
     return 0.0
 
-def current_and_averaged_model_accuracy(train_set, test_set, train_labels, test_labels, avg_weights, current_weights):
+def current_and_averaged_model_accuracy(train_set, test_set, train_labels, test_labels, avg_weights, current_weights, file):
     global training_accuracies_averaged
     global training_accuracies_current
     global test_accuracies_averaged
@@ -99,7 +99,7 @@ def current_and_averaged_model_accuracy(train_set, test_set, train_labels, test_
     test_p_current = predict(test_set, current_weights)
     test_a_current = get_accuracy(test_p_current, test_labels)
 
-    print("Train, test accuracies on current model: " + str(train_a_current) + "  " + str(test_a_current))
+    file.write("Train, test accuracies on current model: " + str(train_a_current) + "  " + str(test_a_current)+"\n")
 
     train_p_avg = predict(train_set, avg_weights)
     train_a_avg = get_accuracy(train_p_avg, train_labels)
@@ -107,7 +107,7 @@ def current_and_averaged_model_accuracy(train_set, test_set, train_labels, test_
     test_p_avg = predict(test_set, avg_weights)
     test_a_avg = get_accuracy(test_p_avg, test_labels)
 
-    print("Train, test accuracies on averaged model: " + str(train_a_avg) + "  " + str(test_a_avg))
+    file.write("Train, test accuracies on averaged model: " + str(train_a_avg) + "  " + str(test_a_avg)+"\n")
     training_accuracies_current.append(train_a_current)
     training_accuracies_averaged.append(train_a_avg)
     test_accuracies_current.append(test_a_current)
@@ -137,6 +137,30 @@ def get_accuracy(predictions, accurate_classifications):
 
     return 1.0 - (float(inaccurate_count) / len(predictions))
 
+def get_final_ablation_results(train, test, train_l, test_l, weights):
+    train_p = predict(train, weights)
+    test_p = predict(test, weights)
+
+    return get_accuracy(train_p, train_l), get_accuracy(test_p, test_l)
+
+def ablation_test(train_set, train_labels, test_set, test_labels):
+    f = open("ablation_test.txt", 'w+')
+    f_results = open("ablation_test_results.txt", 'w+')
+    train = np.array(train_set)
+
+    for idx in range(1, len(data_vectorization_labels)):
+        f_results.write("***** Ablation test removing: " + str(data_vectorization_labels[idx]) + "*****\n")
+        f.write("***** Ablation test removing: " + str(data_vectorization_labels[idx]) + "*****\n")
+        new_train = np.delete(train_set,idx,1)
+        new_test = np.delete(test_set,idx,1)
+
+        avg_weights = averaged_perceptron(new_train, train_labels, new_test, test_labels, f)
+        train_acc, test_acc = get_final_ablation_results(new_train, new_test, train_labels, test_labels, avg_weights)
+        f_results.write("Train accuracy on averaged model: " + str(train_acc) + "\n")
+        f_results.write("Test accuracy on averaged model: " + str(test_acc))
+        f_results.write("\n\n")
+
+
 def main():
     print("Beginning linear classification .... \n")
     build_attr_dict()
@@ -144,9 +168,17 @@ def main():
     vectorized_data_train, vectorized_labels_train = vectorize_data(training_set)
     vectorized_data_test, vectorized_labels_test = vectorize_data(test_set)
 
-    avg_weights = averaged_perceptron(vectorized_data_train, vectorized_labels_train, vectorized_data_test, vectorized_labels_test)
+    file_write = open("averaged_perceptron.txt", 'w+')
+
+    avg_weights = averaged_perceptron(vectorized_data_train, vectorized_labels_train, vectorized_data_test, vectorized_labels_test, file_write)
     plot_assignments()
+    print("Final averaged weights: ")
     print(avg_weights)
+
+    print("\n\nStarting ablation testing....")
+    ablation_test(vectorized_data_train, vectorized_labels_train, vectorized_data_test, vectorized_labels_test)
+
+    print("Done.")
 
 if __name__ == "__main__":
     main()
