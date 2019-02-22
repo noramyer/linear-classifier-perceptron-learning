@@ -15,4 +15,6 @@ $python3 linearly-classify.py
 ```
 
 ## Results
-For each epoch, the accuracy results for both the current model and the averaged model are calculated for both the training and test data sets and printed to the console. Then the training accuracies for the two models over each epoch are plotted, with blue representing current model and green representing averaged model.
+For each epoch, the accuracy results for both the current model and the averaged model are calculated for both the training and test data sets and printed to the console. Then the training and test accuracies for the two models over each epoch are plotted, with blue representing training data accuracies, red representing test data accuracies, circle's representing the current model, and triangles representing the averaged model.
+
+![Accuracy plot example.](accuracy-plot.png)
