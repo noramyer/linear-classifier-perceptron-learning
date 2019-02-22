@@ -8,7 +8,7 @@ from matplotlib.pyplot import *
 import json
 
 data_vectorization_labels = [1.0, "is_weekday", "is_Saturday", "is_Sunday", "is_morning", "is_afternoon", "is_evening", "is_<30", "is_30-60", "is_>60", "is_silly", "is_happy", "is_tired", "friendsVisiting", "kidsPlaying", "atHome", "snacks"]
-training_epochs = 30
+training_epochs = 15
 attr_dict = {}
 training_accuracies_current = []
 test_accuracies_current = []
@@ -38,10 +38,6 @@ def build_attr_dict():
     attr_dict[1] = {'morning': 0.0, 'afternoon': 0.0, 'evening': 0.0}
     attr_dict[2] = {'<30': 0.0, '30-60': 0.0, '>60': 0.0}
     attr_dict[3] = {'silly': 0.0, 'happy': 0.0, 'tired': 0.0}
-    attr_dict[4] = {'no': 0.0, 'yes': 0.0}
-    attr_dict[5] = {'no': 0.0, 'yes': 0.0}
-    attr_dict[6] = {'no': 0.0, 'yes': 0.0}
-    attr_dict[7] = {'no': 0.0, 'yes': 0.0}
 
 def vectorize_data(data_set):
     label_idx = len(data_set[0]) - 1
@@ -52,8 +48,15 @@ def vectorize_data(data_set):
         vectorized_row = [1.0]
         for idx, attr in enumerate(row):
             if not idx is label_idx:
-                attr_dict[idx][attr] = 1.0
-                vectorized_row  = vectorized_row + list(attr_dict[idx].values())
+                if idx < 4:
+                    attr_dict[idx][attr] = 1.0
+                    vectorized_row  = vectorized_row + list(attr_dict[idx].values())
+                else:
+                    if attr == 'no':
+                        vectorized_row.append(0.0)
+                    else:
+                        vectorized_row.append(1.0)
+
         vectorized_data.append(vectorized_row)
         reset_dict()
 
@@ -66,9 +69,7 @@ def averaged_perceptron(train_set, train_labels, test_data, test_labels):
 
     for l in range(training_epochs):
         for i in range(len(train)):
-            h = 0.0
-            if np.dot(w, train[i]) >= 0.0:
-                h = 1.0
+            h = decision_function(w, train[i])
 
             w = w + ((train_labels[i] - h) * train[i])
             t = t + w
@@ -79,6 +80,12 @@ def averaged_perceptron(train_set, train_labels, test_data, test_labels):
         print()
 
     return 1.0/(training_epochs * len(train)) * t
+
+def decision_function(w, row):
+    if np.dot(w, row) >= 0.0:
+        return 1.0
+
+    return 0.0
 
 def current_and_averaged_model_accuracy(train_set, test_set, train_labels, test_labels, avg_weights, current_weights):
     global training_accuracies_averaged
@@ -116,14 +123,7 @@ def reset_dict():
 def predict(data_set, weights):
     predictions = []
     for row in data_set:
-        activation = 0.0
-        for idx in range(len(row)):
-            activation += weights[idx] * row[idx]
-
-        if activation >= 1.0:
-            predictions.append(1.0)
-        else:
-            predictions.append(0.0)
+        predictions.append(decision_function(weights, row))
 
     return predictions
 
